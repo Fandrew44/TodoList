@@ -4,6 +4,11 @@ import Form from './components/Form';
 import TodoList from './components/TodoList';
 
 function App() {
+  //NOTE: If we need to use these States in CHILDREN COMPONENTS, we can just pass them down hierarchically through props
+  //IMPORTANT NOTE: It is good practice to declare the States at the HIGHEST LEVEL COMPONENT possible
+  // - As we can always pass States DOWN to children through props
+  // - However we CANNOT pass States UPWARDS to parents
+  // - (I THINK????)
   const [inputText, setInputText] = useState("");
   const [todos, setTodos] = useState([]);
 
@@ -14,7 +19,8 @@ function App() {
             setInputText={ setInputText }
             todos={ todos }
             setTodos= { setTodos }/>
-      <TodoList />
+      <TodoList todos={ todos }
+                setTodos= { setTodos }/>
     </div>
   );
 }
