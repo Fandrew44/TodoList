@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import Form from './components/Form';
 import TodoList from './components/TodoList';
@@ -9,8 +9,52 @@ function App() {
   // - As we can always pass States DOWN to children through props
   // - However we CANNOT pass States UPWARDS to parents
   // - (I THINK????)
-  const [inputText, setInputText] = useState("");
-  const [todos, setTodos] = useState([]);
+
+  //States
+  const [inputText, setInputText] = useState("");         //The Argument passed into the useState method can be thought of as the 
+  const [todos, setTodos] = useState([]);                 //DEFAULT VALUE
+  const [status, setStatus] = useState("all");
+  const [filteredTodos, setFilteredTodos] = useState([]);
+
+    //Run ONCE when the App first loads
+    // - As there are NO specified States to watch for changes
+    useEffect(() => {
+      getLocalTodos();
+    }, []);
+    //USE EFFECT
+    useEffect(() => {             //1st Argument is the Callback function
+      filterHandler();         //2nd Argument is an Array of the STATES that the useEffect Method is essentially watching for changes
+      saveLocalTodos();
+    }, [todos, status]);                  // -Everytime ANY of the States specified in the Array changes, the Callback function is invoked
+
+  //Functions
+
+  const filterHandler = () => {
+    switch(status) {
+      case 'completed':
+        setFilteredTodos(todos.filter(todo => todo.completed === true));
+        break;
+      case 'uncompleted':
+        setFilteredTodos(todos.filter(todo => todo.completed === false));
+        break;
+      default: 
+        setFilteredTodos(todos);
+        break;
+    }
+  }
+
+  const saveLocalTodos = () => {
+    localStorage.setItem('todos', JSON.stringify(todos));
+  }
+
+  const getLocalTodos = () => {
+    if (localStorage.getItem('todos') == null) {
+      localStorage.setItem('todos', JSON.stringify([]));
+    } else {
+      let todoFromLocal = JSON.parse(localStorage.getItem('todos'));
+      setTodos(todoFromLocal);
+    }
+  }
 
   return (
     <div className="App">
@@ -18,9 +62,11 @@ function App() {
       <Form inputText={ inputText }
             setInputText={ setInputText }
             todos={ todos }
-            setTodos= { setTodos }/>
+            setTodos={ setTodos }
+            setStatus={ setStatus }/>
       <TodoList todos={ todos }
-                setTodos= { setTodos }/>
+                setTodos={ setTodos }
+                filteredTodos={ filteredTodos }/>
     </div>
   );
 }
